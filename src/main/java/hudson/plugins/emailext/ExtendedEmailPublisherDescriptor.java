@@ -4,26 +4,31 @@ import hudson.Extension;
 import hudson.matrix.MatrixProject;
 import hudson.model.AbstractProject;
 import hudson.plugins.emailext.plugins.EmailTriggerDescriptor;
+import hudson.plugins.emailext.plugins.trigger.AlwaysParamtrizedTrigger;
 import hudson.plugins.emailext.plugins.trigger.FailureTrigger;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Mailer;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletException;
+
 import jenkins.model.Jenkins;
 import jenkins.model.JenkinsLocationConfiguration;
 import net.sf.json.JSONObject;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -353,7 +358,7 @@ public final class ExtendedEmailPublisherDescriptor extends BuildStepDescriptor<
                     }
                 }
             } else {
-                defaultTriggerIds.add(Jenkins.getActiveInstance().getDescriptor(FailureTrigger.class).getId());
+                defaultTriggerIds.add(Jenkins.getActiveInstance().getDescriptor(AlwaysParamtrizedTrigger.class).getId());
             }
             save();
         }

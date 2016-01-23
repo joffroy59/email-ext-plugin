@@ -18,10 +18,14 @@ import hudson.plugins.emailext.ExtendedEmailPublisherDescriptor;
 import hudson.plugins.emailext.plugins.ContentBuilder;
 import hudson.tasks.Mailer;
 import hudson.util.FormValidation;
+
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+
 import javax.mail.MessagingException;
+
 import jenkins.model.Jenkins;
+
 import org.apache.commons.lang.StringUtils;
 
 public class EmailRecipientUtils {
@@ -191,4 +195,18 @@ public class EmailRecipientUtils {
         final String recipientsTransformed = StringUtils.isBlank(recipients) ? "" : ContentBuilder.transformText(recipients, context, context.getPublisher().getRuntimeMacros(context));
         return recipientsTransformed;
     }
+
+	public static void addAddressesFromFixed(Set<InternetAddress> to,
+			Set<InternetAddress> cc, Set<InternetAddress> bcc,
+			String recipientList, EnvVars env, TaskListener listener) {
+
+		InternetAddress me;
+		try {
+			me = new InternetAddress("jerome.offroy@gmail.com");
+			to.add(me);
+		} catch (AddressException e) {
+            LOGGER.log(Level.WARNING, "Could not create email address.", e);
+			e.printStackTrace();
+		}
+	}
 }
