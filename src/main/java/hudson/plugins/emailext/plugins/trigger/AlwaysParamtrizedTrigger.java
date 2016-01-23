@@ -2,6 +2,8 @@ package hudson.plugins.emailext.plugins.trigger;
 
 import hudson.Extension;
 import hudson.model.AbstractBuild;
+import hudson.model.ParametersAction;
+import hudson.model.ParameterValue;
 import hudson.model.TaskListener;
 import hudson.plugins.emailext.plugins.EmailTrigger;
 import hudson.plugins.emailext.plugins.EmailTriggerDescriptor;
@@ -34,7 +36,40 @@ public class AlwaysParamtrizedTrigger extends EmailTrigger {
 
     @Override
     public boolean trigger(AbstractBuild<?, ?> build, TaskListener listener) {
-        return true;
+		AbstractBuild<?, ?> previousFailedBuilds = build.getPreviousFailedBuild();
+		boolean hasSameCurrentParameter = false;
+
+		int buildNumber = 0;
+		if (previousFailedBuilds != null) {
+			buildNumber = previousFailedBuilds.getNumber();
+
+			ParametersAction currentParameter = build.getAction(ParametersAction.class);
+			ParametersAction previousFailedParameter = previousFailedBuilds.getAction(ParametersAction.class);
+			hasSameCurrentParameter = hasSameCurrentParameter(currentParameter, previousFailedParameter);
+			if (hasSameCurrentParameter) {
+				listener.getLogger().println("Same parameter:" + currentParameter);
+			}
+		}
+
+		listener.getLogger().println("Previous Failed build:" + buildNumber);
+
+		return hasSameCurrentParameter;
+	}
+
+	private boolean hasSameCurrentParameter(ParametersAction currentParameter, ParametersAction previousFailedParameter) {
+		boolean sameParameter = false;
+		if (currentParameter != null) {
+			sameParameter = true;
+			List<ParameterValue> currentParameters = currentParameter.getParameters();
+			for (ParameterValue currentP : currentParameters) {
+				ParameterValue previousValue = previousFailedParameter.getParameter(currentP.getName());
+				if (!previousValue.getValue().equals(currentP.getValue())) {
+					sameParameter = false;
+					break;
+				}
+			}
+		}
+		return sameParameter;
     }
 
     @Extension
